@@ -1,0 +1,419 @@
+@import "https://cdn.jsdelivr.net/npm/bulma@1.0.4/css/bulma.min.css";
+
+:root {
+    --accent-color: #007E6E;
+    --accent-light: #73AF6F;
+    --accent-dark: #007E6E;
+    --accent-lighter: #E7DEAF;
+    --accent-lightest: #D7C097;
+    --alert-red: #dc3545;
+    --alert-red-dark: #c82333;
+}
+
+/* Light theme base */
+body {
+    background-color: #ffffff;
+    color: #333333;
+}
+
+/* Override Bulma primary color with green accent */
+.button.is-primary,
+.button.is-primary:hover,
+.button.is-primary:focus {
+    background-color: var(--accent-color);
+    border-color: var(--accent-color);
+    color: #ffffff;
+}
+
+.button.is-primary:hover {
+    background-color: var(--accent-light);
+    border-color: var(--accent-light);
+}
+
+.button.is-primary:active {
+    background-color: var(--accent-dark);
+    border-color: var(--accent-dark);
+}
+
+/* Info buttons use lighter green */
+.button.is-info,
+.button.is-info:hover,
+.button.is-info:focus {
+    background-color: var(--accent-light);
+    border-color: var(--accent-light);
+    color: #ffffff;
+}
+
+.button.is-info:hover {
+    background-color: var(--accent-color);
+    border-color: var(--accent-color);
+}
+
+/* Links use green accent */
+a {
+    color: var(--accent-color);
+}
+
+a:hover {
+    color: var(--accent-dark);
+}
+
+/* Navbar styling */
+.navbar {
+    background-color: #ffffff;
+    box-shadow: 0 2px 3px rgba(0, 126, 110, 0.1);
+}
+
+.navbar-item.is-active,
+.navbar-link.is-active {
+    background-color: var(--accent-lighter);
+    color: var(--accent-color);
+    font-weight: 600;
+}
+
+.navbar-item:hover,
+.navbar-link:hover {
+    background-color: var(--accent-lightest);
+    color: var(--accent-color);
+}
+
+/* Box and card styling */
+.box {
+    background-color: #ffffff;
+    box-shadow: 0 2px 3px rgba(0, 126, 110, 0.1);
+    border-top: 3px solid var(--accent-color);
+}
+
+/* Table styling */
+.table {
+    border-radius: 8px;
+    overflow: hidden;
+    border: 1px solid #e0e0e0;
+}
+
+.table thead th {
+    background-color: var(--accent-lighter);
+    color: var(--accent-dark);
+    font-weight: 600;
+    border: none;
+}
+
+.table tbody td {
+    color: #2C2C2C;
+    border-color: #e0e0e0;
+}
+
+.table tbody tr {
+    background-color: #ffffff !important;
+}
+
+.table.is-striped tbody tr:nth-child(even) {
+    background-color: #D3D3D3 !important;
+}
+
+.table.is-striped tbody tr:nth-child(odd) {
+    background-color: #ffffff !important;
+}
+
+.table tbody tr:nth-child(even) {
+    background-color: #D3D3D3 !important;
+}
+
+.table tbody tr:nth-child(odd) {
+    background-color: #ffffff !important;
+}
+
+.table.is-hoverable tbody tr:hover {
+    background-color: var(--accent-lighter);
+}
+
+.table-container {
+    border-radius: 8px;
+    overflow: hidden;
+}
+
+/* Notification/Alerts - RED for alerts */
+.notification.is-danger {
+    background-color: var(--alert-red);
+    color: #ffffff;
+}
+
+.notification.is-danger strong {
+    color: #ffffff;
+}
+
+/* Keep success notifications green */
+.notification.is-success {
+    background-color: var(--accent-color);
+    color: #ffffff;
+}
+
+/* Warning notifications */
+.notification.is-warning {
+    background-color: #ffc107;
+    color: #333333;
+}
+
+/* Input styling - Light theme */
+.input,
+.textarea,
+.select select {
+    background-color: #ffffff;
+    color: #333333;
+    border-color: #dbdbdb;
+}
+
+.input::placeholder,
+.textarea::placeholder {
+    color: #999999;
+}
+
+.input:hover,
+.textarea:hover,
+.select select:hover {
+    border-color: #b5b5b5;
+}
+
+/* Input focus states */
+.input:focus,
+.textarea:focus,
+.select select:focus {
+    background-color: #ffffff;
+    color: #333333;
+    border-color: var(--accent-color);
+    box-shadow: 0 0 0 0.125em rgba(0, 126, 110, 0.25);
+}
+
+/* Select dropdown styling */
+.select:not(.is-multiple):not(.is-loading)::after {
+    border-color: var(--accent-color);
+}
+
+/* Ensure all form elements have light theme */
+input[type="text"],
+input[type="password"],
+input[type="email"],
+input[type="number"],
+input[type="date"],
+input[type="time"],
+input[type="datetime-local"],
+textarea,
+select {
+    background-color: #ffffff !important;
+    color: #333333 !important;
+    border-color: #dbdbdb !important;
+}
+
+input[type="text"]:focus,
+input[type="password"]:focus,
+input[type="email"]:focus,
+input[type="number"]:focus,
+input[type="date"]:focus,
+input[type="time"]:focus,
+input[type="datetime-local"]:focus,
+textarea:focus,
+select:focus {
+    background-color: #ffffff !important;
+    color: #333333 !important;
+    border-color: var(--accent-color) !important;
+}
+
+/* Title and subtitle colors */
+.title {
+    color: #333333;
+}
+
+.subtitle {
+    color: #666666;
+}
+
+/* Section background */
+.section {
+    background-color: #ffffff;
+}
+
+/* Level component styling */
+.level-item .title,
+.level-item .subtitle {
+    color: inherit;
+}
+
+/* Button danger (logout) - keep red */
+.button.is-danger,
+.button.is-danger:hover,
+.button.is-danger:focus {
+    background-color: var(--alert-red);
+    border-color: var(--alert-red);
+    color: #ffffff;
+}
+
+.button.is-danger:hover {
+    background-color: var(--alert-red-dark);
+    border-color: var(--alert-red-dark);
+}
+
+/* Link button styling */
+.button.is-link {
+    color: var(--accent-color);
+}
+
+.button.is-link:hover {
+    background-color: var(--accent-lighter);
+    color: var(--accent-dark);
+}
+
+/* Light button hover */
+.button.is-light:hover {
+    background-color: var(--accent-lighter);
+    color: var(--accent-color);
+}
+
+/* Navbar brand logo area */
+.navbar-brand .navbar-item {
+    color: var(--accent-color);
+    font-weight: 700;
+}
+
+/* Navbar logo styling */
+.navbar-logo {
+    max-height: 3rem;
+    height: auto;
+    width: auto;
+    object-fit: contain;
+}
+
+/* Active state for navigation */
+.navbar-item.is-active {
+    border-bottom: 2px solid var(--accent-color);
+}
+
+/* Consistent spacing utilities */
+.mt-1 {
+    margin-top: 1rem;
+}
+
+.mt-2 {
+    margin-top: 2rem;
+}
+
+.mb-1 {
+    margin-bottom: 1rem;
+}
+
+.mb-2 {
+    margin-bottom: 2rem;
+}
+
+/* Consistent section spacing */
+.section {
+    padding: 3rem 1.5rem;
+}
+
+/* Consistent container max-width */
+.container {
+    max-width: 1200px;
+}
+
+/* Consistent form spacing */
+.field:not(:last-child) {
+    margin-bottom: 1.25rem;
+}
+
+/* Consistent box spacing */
+.box {
+    padding: 1.5rem;
+}
+
+/* Consistent table container */
+.table-container {
+    margin-top: 1.5rem;
+    overflow-x: auto;
+}
+
+/* Consistent notification spacing */
+.notification {
+    margin-bottom: 1.5rem;
+}
+
+/* Consistent button spacing in groups */
+.buttons:not(:last-child) {
+    margin-bottom: 1.5rem;
+}
+
+/* Consistent level component spacing */
+.level {
+    margin-bottom: 1.5rem;
+}
+
+/* Consistent title spacing */
+.title:not(:last-child) {
+    margin-bottom: 1rem;
+}
+
+.title.is-2:not(:last-child) {
+    margin-bottom: 1.25rem;
+}
+
+.title.is-4:not(:last-child) {
+    margin-bottom: 1rem;
+}
+
+/* Consistent subtitle spacing */
+.subtitle:not(:last-child) {
+    margin-bottom: 1.5rem;
+}
+
+/* Consistent page header spacing */
+.page-header {
+    margin-bottom: 2rem;
+}
+
+/* Consistent back button container */
+.back-button-container {
+    margin-top: 1rem;
+    text-align: center;
+}
+
+/* Consistent centered content */
+.centered-content {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 50vh;
+}
+
+/* Consistent card/dashboard item spacing */
+.dashboard-header {
+    margin-bottom: 2rem;
+}
+
+/* Consistent table action buttons */
+.table .button {
+    margin: 0 0.25rem;
+}
+
+/* Consistent form container */
+.form-container {
+    max-width: 500px;
+    margin: 0 auto;
+}
+
+/* Consistent login/register form spacing */
+.login-form-container {
+    margin-top: 2rem;
+}
+
+/* Consistent action buttons container */
+.action-buttons {
+    margin-top: 1.5rem;
+    display: flex;
+    gap: 0.75rem;
+    justify-content: flex-end;
+}
+
+/* Consistent empty state */
+.empty-state {
+    text-align: center;
+    padding: 3rem 1.5rem;
+    color: #666666;
+}
