@@ -1,19 +1,30 @@
 <?php
+// Start the session to access session variables
 session_start();
 
-// Unset all session variables
+// Clear all session variables
 $_SESSION = array();
 
-// Destroy the session cookie
+// Delete the session cookie if it exists
 if (isset($_COOKIE[session_name()])) {
-    setcookie(session_name(), '', time()-3600, '/');
+    setcookie(session_name(), '', array(
+        'expires' => time() - 42000,
+        'path' => '/',
+        'domain' => '',
+        'secure' => false,
+        'httponly' => true
+    ));
 }
 
-// Destroy the session
-session_destroy();
-
-// Redirect to login page
-header("Location: index.php");
-exit();
+// Completely destroy the session
+if (session_destroy()) {
+    // Redirect to login page after successful session destruction
+    header("Location: index.php");
+    exit();
+} else {
+    // If session destruction fails, still redirect
+    header("Location: index.php");
+    exit();
+}
 ?>
 
