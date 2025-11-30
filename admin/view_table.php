@@ -2,13 +2,10 @@
 session_start();
 require_once '../componets/conc.com.php';
 
-// Check if user is logged in
 if (!isset($_SESSION['logged_in']) || $_SESSION['logged_in'] !== true) {
     header("Location: index.php");
     exit();
 }
-
-// Get table name from query parameter
 $tableName = isset($_GET['table']) ? mysqli_real_escape_string($conn, $_GET['table']) : '';
 
 if (empty($tableName)) {

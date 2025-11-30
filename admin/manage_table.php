@@ -2,119 +2,184 @@
 session_start();
 require_once '../componets/conc.com.php';
 
-// Check if user is logged in
+// -- Auth check
 if (!isset($_SESSION['logged_in']) || $_SESSION['logged_in'] !== true) {
     header("Location: index.php");
     exit();
 }
 
-// Get table name and action
+// -- Get table/action/id from GET (sanitized where needed)
 $tableName = isset($_GET['table']) ? mysqli_real_escape_string($conn, $_GET['table']) : '';
-$action = isset($_GET['action']) ? $_GET['action'] : '';
-$recordId = isset($_GET['id']) ? mysqli_real_escape_string($conn, $_GET['id']) : '';
+$action    = isset($_GET['action']) ? $_GET['action'] : ''; // 'create'|'edit'|'delete' (GET view)
+$recordId  = isset($_GET['id']) ? mysqli_real_escape_string($conn, $_GET['id']) : '';
 
+// minimal table presence check
 if (empty($tableName)) {
     header("Location: dashboard.php");
     exit();
 }
+$tblCheck = mysqli_query($conn, "SHOW TABLES LIKE '" . mysqli_real_escape_string($conn, $tableName) . "'");
+if (!$tblCheck || mysqli_num_rows($tblCheck) == 0) {
+    die('Table not found.');
+}
 
-// Handle form submissions
-if ($_SERVER["REQUEST_METHOD"] == "POST") {
-    if (isset($_POST['action'])) {
-        $action = $_POST['action'];
-        
-        if ($action == 'create') {
-            // Create new record
-            $columns = [];
-            $values = [];
-            foreach ($_POST as $key => $value) {
-                if ($key != 'action' && $key != 'table') {
-                    $columns[] = "`" . mysqli_real_escape_string($conn, $key) . "`";
-                    $values[] = "'" . mysqli_real_escape_string($conn, $value) . "'";
-                }
-            }
-            $query = "INSERT INTO `$tableName` (" . implode(", ", $columns) . ") VALUES (" . implode(", ", $values) . ")";
-            if (mysqli_query($conn, $query)) {
-                $_SESSION['success'] = "Record created successfully!";
-                header("Location: view_table.php?table=" . urlencode($tableName));
-                exit();
+// Helper: fetch columns and primary key
+function get_table_columns_and_pk($conn, $table) {
+    $cols = [];
+    $pk = '';
+    $res = mysqli_query($conn, "DESCRIBE `" . mysqli_real_escape_string($conn, $table) . "`");
+    while ($r = mysqli_fetch_assoc($res)) {
+        $cols[] = $r;
+        if ($r['Key'] === 'PRI') $pk = $r['Field'];
+    }
+    // fallback pk
+    if (!$pk && count($cols) > 0) $pk = $cols[0]['Field'];
+    return [$cols, $pk];
+}
+
+list($columnsMeta, $primaryKey) = get_table_columns_and_pk($conn, $tableName);
+
+// Build list of allowed column names for form processing
+$allowedCols = array_map(function($c){ return $c['Field']; }, $columnsMeta);
+
+// ---------- HANDLE POST ----------
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    // expect action from submit button value
+    $postAction = $_POST['action'] ?? '';
+    $postTable  = $_POST['table'] ?? '';
+    if ($postTable !== $tableName) {
+        // sanity check: posted table must match GET table (or you can remove this)
+        $_SESSION['error'] = "Table mismatch.";
+        header("Location: manage_table.php?table=" . urlencode($tableName) . "&action=" . urlencode($action) . ($recordId ? "&id=" . urlencode($recordId) : ""));
+        exit();
+    }
+
+    // Filter POST to only allowed columns
+    $inputData = [];
+    foreach ($_POST as $k => $v) {
+        if (in_array($k, $allowedCols, true)) {
+            // treat empty string as null? you can change behavior here
+            $inputData[$k] = ($v === '') ? null : $v;
+        }
+    }
+
+    // ---------- CREATE ----------
+    if ($postAction === 'create') {
+        // Prepare INSERT: only include columns present in $inputData (and allowedCols)
+        $cols = array_keys($inputData);
+        if (count($cols) === 0) {
+            $_SESSION['error'] = "No data provided.";
+        } else {
+            $placeholders = implode(',', array_fill(0, count($cols), '?'));
+            $fieldList = implode(', ', array_map(function($c){ return "`$c`"; }, $cols));
+            $sql = "INSERT INTO `" . mysqli_real_escape_string($conn, $tableName) . "` ($fieldList) VALUES ($placeholders)";
+            $stmt = mysqli_prepare($conn, $sql);
+            if (!$stmt) {
+                $_SESSION['error'] = "Prepare failed: " . mysqli_error($conn);
             } else {
-                $_SESSION['error'] = "Error creating record: " . mysqli_error($conn);
-            }
-        } elseif ($action == 'update') {
-            // Update existing record
-            $recordId = mysqli_real_escape_string($conn, $_POST['id']);
-            $updates = [];
-            foreach ($_POST as $key => $value) {
-                if ($key != 'action' && $key != 'table' && $key != 'id') {
-                    $updates[] = "`" . mysqli_real_escape_string($conn, $key) . "` = '" . mysqli_real_escape_string($conn, $value) . "'";
-                }
-            }
-            
-            // Get primary key
-            $primaryKey = '';
-            $result = mysqli_query($conn, "SHOW KEYS FROM `$tableName` WHERE Key_name = 'PRIMARY'");
-            if ($result && $row = mysqli_fetch_assoc($result)) {
-                $primaryKey = $row['Column_name'];
-            }
-            
-            if ($primaryKey) {
-                $query = "UPDATE `$tableName` SET " . implode(", ", $updates) . " WHERE `$primaryKey` = '$recordId'";
-                if (mysqli_query($conn, $query)) {
-                    $_SESSION['success'] = "Record updated successfully!";
-                    header("Location: view_table.php?table=" . urlencode($tableName));
-                    exit();
+                // bind all as strings (use 's' for each param)
+                $types = str_repeat('s', count($cols));
+                $values = array_map(function($v){ return ($v === null) ? null : (string)$v; }, array_values($inputData));
+                $refs = [];
+                foreach ($values as $i => $val) $refs[$i] = &$values[$i];
+                array_unshift($refs, $types);
+                call_user_func_array([$stmt, 'bind_param'], $refs);
+                $exec = $stmt->execute();
+                if ($exec) {
+                    $_SESSION['success'] = "Record created successfully.";
                 } else {
-                    $_SESSION['error'] = "Error updating record: " . mysqli_error($conn);
+                    $_SESSION['error'] = "Insert failed: " . $stmt->error;
                 }
-            }
-        } elseif ($action == 'delete') {
-            // Delete record
-            $recordId = mysqli_real_escape_string($conn, $_POST['id']);
-            
-            // Get primary key
-            $primaryKey = '';
-            $result = mysqli_query($conn, "SHOW KEYS FROM `$tableName` WHERE Key_name = 'PRIMARY'");
-            if ($result && $row = mysqli_fetch_assoc($result)) {
-                $primaryKey = $row['Column_name'];
-            }
-            
-            if ($primaryKey) {
-                $query = "DELETE FROM `$tableName` WHERE `$primaryKey` = '$recordId'";
-                if (mysqli_query($conn, $query)) {
-                    $_SESSION['success'] = "Record deleted successfully!";
-                    header("Location: view_table.php?table=" . urlencode($tableName));
-                    exit();
-                } else {
-                    $_SESSION['error'] = "Error deleting record: " . mysqli_error($conn);
-                }
+                $stmt->close();
             }
         }
+        header("Location: view_table.php?table=" . urlencode($tableName));
+        exit();
     }
-}
 
-// Get table structure
-$query = "DESCRIBE `$tableName`";
-$result = mysqli_query($conn, $query);
-$columns = [];
-$primaryKey = '';
-
-if ($result) {
-    while ($row = mysqli_fetch_assoc($result)) {
-        $columns[] = $row;
-        if ($row['Key'] == 'PRI') {
-            $primaryKey = $row['Field'];
+    // ---------- UPDATE ----------
+    if ($postAction === 'update') {
+        $id = $_POST['id'] ?? '';
+        if ($id === '') {
+            $_SESSION['error'] = "Missing record id for update.";
+            header("Location: view_table.php?table=" . urlencode($tableName));
+            exit();
         }
+        $updateCols = array_filter(array_keys($inputData), function($c) use ($primaryKey){ return $c !== $primaryKey; });
+        if (count($updateCols) === 0) {
+            $_SESSION['error'] = "Nothing to update.";
+            header("Location: view_table.php?table=" . urlencode($tableName));
+            exit();
+        }
+        $setParts = [];
+        foreach ($updateCols as $c) $setParts[] = "`$c` = ?";
+        $sql = "UPDATE `" . mysqli_real_escape_string($conn, $tableName) . "` SET " . implode(', ', $setParts) . " WHERE `" . mysqli_real_escape_string($conn, $primaryKey) . "` = ? LIMIT 1";
+        $stmt = mysqli_prepare($conn, $sql);
+        if (!$stmt) {
+            $_SESSION['error'] = "Prepare failed: " . mysqli_error($conn);
+            header("Location: view_table.php?table=" . urlencode($tableName));
+            exit();
+        }
+        // bind params: first the update values in order, then id
+        $types = str_repeat('s', count($updateCols)) . 's';
+        $values = [];
+        foreach ($updateCols as $c) $values[] = ($inputData[$c] === null) ? null : (string)$inputData[$c];
+        $values[] = (string)$id;
+        $refs = [];
+        foreach ($values as $i => $val) $refs[$i] = &$values[$i];
+        array_unshift($refs, $types);
+        call_user_func_array([$stmt, 'bind_param'], $refs);
+        $exec = $stmt->execute();
+        if ($exec) {
+            $_SESSION['success'] = "Record updated successfully.";
+        } else {
+            $_SESSION['error'] = "Update failed: " . $stmt->error;
+        }
+        $stmt->close();
+        header("Location: view_table.php?table=" . urlencode($tableName));
+        exit();
     }
+
+    // ---------- DELETE ---------- //
+    if ($postAction === 'delete') {
+        $id = $_POST['id'] ?? '';
+        if ($id === '') {
+            $_SESSION['error'] = "Missing record id for delete.";
+            header("Location: view_table.php?table=" . urlencode($tableName));
+            exit();
+        }
+        $sql = "DELETE FROM `" . mysqli_real_escape_string($conn, $tableName) . "` WHERE `" . mysqli_real_escape_string($conn, $primaryKey) . "` = ? LIMIT 1";
+        $stmt = mysqli_prepare($conn, $sql);
+        if (!$stmt) {
+            $_SESSION['error'] = "Prepare failed: " . mysqli_error($conn);
+            header("Location: view_table.php?table=" . urlencode($tableName));
+            exit();
+        }
+        $stmt->bind_param('s', $id);
+        $exec = $stmt->execute();
+        if ($exec) {
+            $_SESSION['success'] = "Record deleted successfully.";
+        } else {
+            $_SESSION['error'] = "Delete failed: " . $stmt->error;
+        }
+        $stmt->close();
+        header("Location: view_table.php?table=" . urlencode($tableName));
+        exit();
+    }
+
+    header("Location: view_table.php?table=" . urlencode($tableName));
+    exit();
 }
 
-// Get record data for edit
 $recordData = [];
-if ($action == 'edit' && !empty($recordId) && $primaryKey) {
-    $query = "SELECT * FROM `$tableName` WHERE `$primaryKey` = '$recordId' LIMIT 1";
-    $result = mysqli_query($conn, $query);
-    if ($result && $row = mysqli_fetch_assoc($result)) {
-        $recordData = $row;
+if ($action === 'edit' && $recordId !== '') {
+    $sql = "SELECT * FROM `" . mysqli_real_escape_string($conn, $tableName) . "` WHERE `" . mysqli_real_escape_string($conn, $primaryKey) . "` = ? LIMIT 1";
+    if ($stmt = mysqli_prepare($conn, $sql)) {
+        $stmt->bind_param('s', $recordId);
+        $stmt->execute();
+        $res = $stmt->get_result();
+        $recordData = $res->fetch_assoc() ?: [];
+        $stmt->close();
     }
 }
 
@@ -155,11 +220,11 @@ require_once '../componets/header.com.php';
         }
         ?>
 
-        <?php if ($action == 'delete'): ?>
+        <?php if ($action === 'delete'): ?>
             <div class="box">
                 <h2 class="title is-4">Confirm Delete</h2>
                 <p>Are you sure you want to delete this record?</p>
-                <form method="POST" action="manage_table.php">
+                <form method="POST" action="manage_table.php?table=<?php echo urlencode($tableName); ?>">
                     <input type="hidden" name="action" value="delete">
                     <input type="hidden" name="table" value="<?php echo htmlspecialchars($tableName); ?>">
                     <input type="hidden" name="id" value="<?php echo htmlspecialchars($recordId); ?>">
@@ -175,69 +240,61 @@ require_once '../componets/header.com.php';
             </div>
         <?php else: ?>
             <div class="box">
-                <form method="POST" action="manage_table.php">
-                    <input type="hidden" name="action" value="<?php echo htmlspecialchars($action); ?>">
+                <form method="POST" action="manage_table.php?table=<?php echo urlencode($tableName); ?>">
+                    <!-- Do not include an 'action' hidden input. The submit button sets action -->
                     <input type="hidden" name="table" value="<?php echo htmlspecialchars($tableName); ?>">
-                    <?php if ($action == 'edit' && $primaryKey): ?>
+                    <?php if ($action === 'edit' && $primaryKey): ?>
                         <input type="hidden" name="id" value="<?php echo htmlspecialchars($recordId); ?>">
                     <?php endif; ?>
 
-                    <?php foreach ($columns as $column): ?>
-                        <?php if ($column['Key'] != 'PRI' || $action == 'edit'): ?>
-                            <div class="field">
-                                <label class="label" for="<?php echo htmlspecialchars($column['Field']); ?>">
-                                    <?php echo htmlspecialchars($column['Field']); ?>
-                                    <?php if ($column['Null'] == 'NO' && $column['Key'] != 'PRI'): ?>
-                                        <span class="has-text-danger">*</span>
-                                    <?php endif; ?>
-                                </label>
-                                <div class="control">
-                                    <?php
-                                    $value = isset($recordData[$column['Field']]) ? $recordData[$column['Field']] : '';
-                                    $fieldName = $column['Field'];
-                                    $isRequired = ($column['Null'] == 'NO' && $column['Key'] != 'PRI');
-                                    
-                                    if (strpos($column['Type'], 'text') !== false || strpos($column['Type'], 'varchar') !== false): ?>
-                                        <input class="input" type="text" 
-                                               id="<?php echo htmlspecialchars($fieldName); ?>" 
-                                               name="<?php echo htmlspecialchars($fieldName); ?>" 
-                                               value="<?php echo htmlspecialchars($value); ?>"
-                                               <?php echo $isRequired ? 'required' : ''; ?>>
-                                    <?php elseif (strpos($column['Type'], 'int') !== false): ?>
-                                        <input class="input" type="number" 
-                                               id="<?php echo htmlspecialchars($fieldName); ?>" 
-                                               name="<?php echo htmlspecialchars($fieldName); ?>" 
-                                               value="<?php echo htmlspecialchars($value); ?>"
-                                               <?php echo $isRequired ? 'required' : ''; ?>>
-                                    <?php elseif (strpos($column['Type'], 'date') !== false): ?>
-                                        <input class="input" type="date" 
-                                               id="<?php echo htmlspecialchars($fieldName); ?>" 
-                                               name="<?php echo htmlspecialchars($fieldName); ?>" 
-                                               value="<?php echo htmlspecialchars($value); ?>"
-                                               <?php echo $isRequired ? 'required' : ''; ?>>
-                                    <?php elseif (strpos($column['Type'], 'time') !== false): ?>
-                                        <input class="input" type="time" 
-                                               id="<?php echo htmlspecialchars($fieldName); ?>" 
-                                               name="<?php echo htmlspecialchars($fieldName); ?>" 
-                                               value="<?php echo htmlspecialchars($value); ?>"
-                                               <?php echo $isRequired ? 'required' : ''; ?>>
-                                    <?php else: ?>
-                                        <input class="input" type="text" 
-                                               id="<?php echo htmlspecialchars($fieldName); ?>" 
-                                               name="<?php echo htmlspecialchars($fieldName); ?>" 
-                                               value="<?php echo htmlspecialchars($value); ?>"
-                                               <?php echo $isRequired ? 'required' : ''; ?>>
-                                    <?php endif; ?>
-                                </div>
+                    <?php foreach ($columnsMeta as $column): ?>
+                        <?php
+                        $colName = $column['Field'];
+                        // If creating, skip auto-increment primary key fields
+                        if ($action === 'create' && $column['Extra'] === 'auto_increment') continue;
+                        // For delete form we don't show fields (handled above)
+                        ?>
+                        <div class="field">
+                            <label class="label" for="<?php echo htmlspecialchars($colName); ?>">
+                                <?php echo htmlspecialchars($colName); ?>
+                                <?php if ($column['Null'] === 'NO' && $column['Key'] !== 'PRI'): ?>
+                                    <span class="has-text-danger">*</span>
+                                <?php endif; ?>
+                            </label>
+                            <div class="control">
+                                <?php
+                                $value = $recordData[$colName] ?? '';
+                                $isRequired = ($column['Null'] === 'NO' && $column['Key'] !== 'PRI');
+
+                                // determine input type
+                                $type = 'text';
+                                if (stripos($column['Type'], 'int') !== false) $type = 'number';
+                                elseif (stripos($column['Type'], 'date') !== false) $type = 'date';
+                                elseif (stripos($column['Type'], 'time') !== false) $type = 'time';
+                                elseif (stripos($column['Type'], 'text') !== false) $type = 'textarea';
+                                elseif (stripos($column['Type'], 'enum') !== false) $type = 'text'; // could parse enum options
+                                ?>
+
+                                <?php if ($type === 'textarea'): ?>
+                                    <textarea class="textarea" id="<?php echo htmlspecialchars($colName); ?>" name="<?php echo htmlspecialchars($colName); ?>" <?php echo $isRequired ? 'required' : ''; ?>><?php echo htmlspecialchars($value); ?></textarea>
+                                <?php else: ?>
+                                    <input class="input" type="<?php echo htmlspecialchars($type); ?>"
+                                           id="<?php echo htmlspecialchars($colName); ?>"
+                                           name="<?php echo htmlspecialchars($colName); ?>"
+                                           value="<?php echo htmlspecialchars($value); ?>"
+                                           <?php echo $isRequired ? 'required' : ''; ?>>
+                                <?php endif; ?>
                             </div>
-                        <?php endif; ?>
+                        </div>
                     <?php endforeach; ?>
 
                     <div class="field is-grouped mt-2">
                         <div class="control">
-                            <button type="submit" class="button is-primary">
-                                <?php echo $action == 'edit' ? 'Update' : 'Create'; ?> Record
-                            </button>
+                            <?php if ($action === 'edit'): ?>
+                                <button type="submit" name="action" value="update" class="button is-primary">Update Record</button>
+                            <?php else: ?>
+                                <button type="submit" name="action" value="create" class="button is-primary">Create Record</button>
+                            <?php endif; ?>
                         </div>
                         <div class="control">
                             <a href="view_table.php?table=<?php echo urlencode($tableName); ?>" class="button is-light">Cancel</a>
@@ -250,5 +307,3 @@ require_once '../componets/header.com.php';
 </section>
 </body>
 </html>
-
-
