@@ -34,8 +34,10 @@ require_once '../componets/header.com.php';
         
         <h2 class="title is-4">Courses</h2>
         <?php
-        // Get all courses from the database
-        $query = "SELECT * FROM courses";
+        echo $_SESSION['user_id'];
+        echo $_SESSION['username'];
+       
+        $query = "SELECT * FROM courses WHERE CourseID = 1" ;
         $result = mysqli_query($conn, $query);
         
         if ($result && mysqli_num_rows($result) > 0) {
@@ -43,14 +45,12 @@ require_once '../componets/header.com.php';
             echo "<table class='table is-striped is-fullwidth is-hoverable'>";
             echo "<thead><tr>";
             
-            // Get column names
             $fields = mysqli_fetch_fields($result);
             foreach ($fields as $field) {
                 echo "<th>" . htmlspecialchars($field->name) . "</th>";
             }
             echo "</tr></thead><tbody>";
             
-            // Display course data
             while ($row = mysqli_fetch_assoc($result)) {
                 echo "<tr>";
                 foreach ($row as $value) {

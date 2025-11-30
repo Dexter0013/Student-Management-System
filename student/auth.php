@@ -12,14 +12,14 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         exit();
     }
     
-    $query = "SELECT * FROM users WHERE Username = '$username' AND PasswordHash = '$password'";
+    $query = "SELECT * FROM student_login WHERE studentUsername = '$username' AND studentPassword = '$password'";
     $result = mysqli_query($conn, $query);
     
     if ($result && mysqli_num_rows($result) > 0) {
         $user = mysqli_fetch_assoc($result);
         
-        $_SESSION['user_id'] = $user['UserID'];
-        $_SESSION['username'] = $user['Username'];
+        $_SESSION['user_id'] = $user['StudentID'];
+        $_SESSION['username'] = $user['studentUsername'];
         $_SESSION['logged_in'] = true;
         
         header("Location: dashboard.php");

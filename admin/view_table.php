@@ -37,7 +37,7 @@ require_once '../componets/header.com.php';
                 </div>
                 <div class="level-right">
                     <a href="manage_table.php?table=<?php echo urlencode($tableName); ?>&action=create" class="button is-success">Add New Record</a>
-                    <a href="dashboard.php" class="button is-link">Back to Dashboard</a>
+                    <a href="dashboard.php" class="button is-primary">Back to Dashboard</a>
                 </div>
             </div>
         </div>

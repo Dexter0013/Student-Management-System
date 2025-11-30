@@ -20,47 +20,90 @@ $dashboardUrl = 'dashboard.php';
 require_once '../componets/header.com.php';
 ?>
 <section class="section">
-    <div class="container">
-        <div class="dashboard-header">
-            <div class="level">
-                <div class="level-left">
-                    <div>
-                        <h1 class="title is-2">Admin Dashboard</h1>
-                        <p class="subtitle">Welcome, <?php echo htmlspecialchars($_SESSION['username']); ?>!</p>
-                    </div>
-                </div>
-            </div>
+  <div class="container">
+    <div class="columns">
+      <div class="column is-narrow">
+       
+        <aside class="menu is-fullheight">
+          <p class="menu-label">Tables</p>
+          <ul class="menu-list mb-1 mt-1 is-scrollable" style="max-height: 400px; overflow-y: auto;">
+                    <?php
+                    $tablesResult = mysqli_query($conn, "SHOW TABLES");
+                    while ($row = mysqli_fetch_row($tablesResult)) {
+                        $tableName = $row[0];
+                        echo '<li><a href="view_table.php?table=' . urlencode($tableName) . '">' . htmlspecialchars($tableName) . '</a></li>';
+                    }
+                    ?>
+                </ul>
+            </aside>
         </div>
-        
-        <h2 class="title is-4">Database Tables</h2>
-        <?php
-        // Get all tables from the database
-        $query = "SHOW TABLES";
-        $result = mysqli_query($conn, $query);
-        
-        if ($result && mysqli_num_rows($result) > 0) {
-            echo "<div class='table-container'>";
-            echo "<table class='table is-striped is-fullwidth is-hoverable'>";
-            echo "<thead><tr><th>Table Name</th><th>Actions</th></tr></thead>";
-            echo "<tbody>";
-            
-            while ($row = mysqli_fetch_array($result)) {
-                $tableName = $row[0];
-                echo "<tr>";
-                echo "<td>" . htmlspecialchars($tableName) . "</td>";
-                echo "<td>";
-                echo "<a href='view_table.php?table=" . urlencode($tableName) . "' class='button is-small is-primary'>View Data</a> ";
-                echo "<a href='manage_table.php?table=" . urlencode($tableName) . "&action=create' class='button is-small is-success'>Add</a>";
-                echo "</td>";
-                echo "</tr>";
-            }
-            
-            echo "</tbody></table></div>";
-        } else {
-            echo "<div class='notification is-warning empty-state'>No tables found in the database.</div>";
-        }
-        ?>
+        <div class="container">
+            <h2 class="title is-4">Select a table from the menu to view and manage its records.</h2>
+                    <?php
+                    $studentCount = (int)mysqli_fetch_assoc(mysqli_query($conn, "SELECT COUNT(*) AS c FROM students"))['c'];
+                    $courseCount  = (int)mysqli_fetch_assoc(mysqli_query($conn, "SELECT COUNT(*) AS c FROM courses"))['c'];
+                    $facultyCount = (int)mysqli_fetch_assoc(mysqli_query($conn, "SELECT COUNT(*) AS c FROM instructors"))['c'];
+                    ?>
+
+<div class="container">
+  <h2 class="title is-4">Overview</h2>
+
+  <div class="columns is-multiline">
+
+    <!-- Students -->
+    <div class="column is-12-mobile is-4-tablet is-4-desktop">
+      <a href="view_table.php?table=students">
+        <div class="card has-background-white has-text-centered p-4 is-flex is-flex-direction-column is-align-items-center is-justify-content-center">
+             <figure class="image is-128x128">
+            <img src="../images/group-users.png" alt="">
+            </figure>
+          <div class="card-content">
+            <p class="heading">Students</p>
+            <p class="title is-3 mb-2"><?= $studentCount ?></p>
+            <span class="tag is-primary">View</span>
+          </div>
+        </div>
+      </a>
     </div>
+
+    <!-- Courses -->
+    <div class="column is-12-mobile is-4-tablet is-4-desktop">
+      <a href="view_table.php?table=courses">
+        <div class="card has-background-white has-text-centered p-4 is-flex is-flex-direction-column is-align-items-center is-justify-content-center">
+             <figure class="image is-128x128">
+            <img src="../images/open-book.png" alt="">
+            </figure>
+          <div class="card-content">
+            <p class="heading">Courses</p>
+            <p class="title is-3 mb-2"><?= $courseCount ?></p>
+            <span class="tag is-link">View</span>
+          </div>
+        </div>
+      </a>
+    </div>
+
+    <!-- Faculty -->
+    <div class="column is-12-mobile is-4-tablet is-4-desktop">
+      <a href="view_table.php?table=instructors">
+        <div class="card has-background-white has-text-centered p-4 is-flex is-flex-direction-column is-align-items-center is-justify-content-center">
+            <figure class="image is-128x128">
+                <img src="../images/school.png" alt="">
+            </figure>
+          <div class="card-content">
+            <p class="heading">Faculty</p>
+            <p class="title is-3 mb-2"><?= $facultyCount ?></p>
+            <span class="tag is-info">View</span>
+          </div>
+        </div>
+      </a>
+    </div>
+
+  </div>
+</div>
+
+        </div>
+    
+
 </section>
 </body>
 </html>
