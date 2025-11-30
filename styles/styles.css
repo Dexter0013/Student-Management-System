@@ -417,3 +417,269 @@ select:focus {
     padding: 3rem 1.5rem;
     color: #666666;
 }
+
+/* ========== RESPONSIVE DESIGN ========== */
+
+/* Mobile Devices (up to 768px) */
+@media screen and (max-width: 768px) {
+    /* Adjust section padding for mobile */
+    .section {
+        padding: 1.5rem 1rem;
+    }
+
+    /* Stack columns on mobile */
+    .columns {
+        display: block;
+    }
+
+    .column {
+        margin-bottom: 1rem;
+        width: 100% !important;
+    }
+
+    .column.is-narrow {
+        width: 100% !important;
+    }
+
+    .column.is-3 {
+        width: 100% !important;
+    }
+
+    .column.is-8-tablet {
+        width: 100% !important;
+    }
+
+    .column.is-4-tablet {
+        width: 100% !important;
+    }
+
+    /* Adjust title sizes on mobile */
+    .title.is-2 {
+        font-size: 1.5rem;
+    }
+
+    .title.is-4 {
+        font-size: 1.25rem;
+    }
+
+    .subtitle {
+        font-size: 0.95rem;
+    }
+
+    /* Responsive navbar */
+    .navbar {
+        padding: 0.5rem 1rem;
+    }
+
+    .navbar-item {
+        padding: 0.5rem;
+    }
+
+    /* Responsive menu */
+    .menu.is-fullheight {
+        min-height: auto;
+        margin-bottom: 1rem;
+    }
+
+    .menu-list {
+        max-height: 200px;
+        overflow-y: auto;
+    }
+
+    /* Responsive table */
+    .table-container {
+        overflow-x: auto;
+    }
+
+    .table {
+        font-size: 0.85rem;
+    }
+
+    .table th, .table td {
+        padding: 0.5rem 0.25rem;
+    }
+
+    /* Responsive cards */
+    .card {
+        margin-bottom: 1rem;
+    }
+
+    .card-header-title {
+        font-size: 1rem;
+    }
+
+    .card-content {
+        padding: 1rem;
+    }
+
+    /* Responsive level component */
+    .level {
+        flex-direction: column;
+    }
+
+    .level-left,
+    .level-right {
+        flex-direction: column;
+        width: 100%;
+    }
+
+    .level-item {
+        margin-bottom: 0.5rem;
+    }
+
+    /* Responsive buttons */
+    .buttons {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.5rem;
+    }
+
+    .button {
+        flex: 1 1 auto;
+        min-width: 120px;
+    }
+
+    /* Responsive form */
+    .form-container {
+        max-width: 100%;
+        padding: 0 1rem;
+    }
+
+    .field {
+        margin-bottom: 1rem;
+    }
+
+    .input,
+    .textarea,
+    .select {
+        width: 100%;
+        font-size: 16px; /* Prevents zoom on mobile */
+    }
+
+    /* Responsive notification */
+    .notification {
+        padding: 1rem;
+        font-size: 0.95rem;
+    }
+
+    /* Responsive action buttons */
+    .action-buttons {
+        flex-direction: column;
+        justify-content: stretch;
+    }
+
+    .action-buttons .button {
+        width: 100%;
+    }
+
+    /* Responsive sidebar */
+    .is-narrow {
+        max-width: 100%;
+    }
+
+    /* Responsive dashboard header */
+    .dashboard-header {
+        margin-bottom: 1rem;
+    }
+
+    /* Hide overflow on mobile */
+    body {
+        overflow-x: hidden;
+    }
+}
+
+/* Tablets (769px to 1024px) */
+@media screen and (min-width: 769px) and (max-width: 1024px) {
+    .section {
+        padding: 2rem 1.5rem;
+    }
+
+    .container {
+        max-width: 100%;
+        padding: 0 1rem;
+    }
+
+    .title.is-2 {
+        font-size: 1.75rem;
+    }
+
+    .column.is-8-tablet {
+        width: 66.66666%;
+    }
+
+    .column.is-4-tablet {
+        width: 33.33333%;
+    }
+
+    .column.is-3 {
+        width: 25%;
+    }
+}
+
+/* Desktop and Larger (1025px and above) */
+@media screen and (min-width: 1025px) {
+    .section {
+        padding: 3rem 1.5rem;
+    }
+
+    .container {
+        max-width: 1200px;
+    }
+
+    .columns {
+        display: flex;
+    }
+
+    .column {
+        flex: 1;
+    }
+
+    .column.is-narrow {
+        flex: 0 0 auto;
+    }
+
+    .column.is-3 {
+        flex: 0 0 25%;
+    }
+
+    .column.is-4-tablet {
+        flex: 0 0 33.33333%;
+    }
+
+    .column.is-8-tablet {
+        flex: 0 0 66.66666%;
+    }
+}
+
+/* Utility: Responsive text */
+@media screen and (max-width: 480px) {
+    body {
+        font-size: 14px;
+    }
+
+    .title {
+        font-size: 1.25rem !important;
+    }
+
+    .subtitle {
+        font-size: 0.9rem !important;
+    }
+
+    .tag {
+        font-size: 0.75rem;
+        padding: 0.25rem 0.5rem;
+    }
+}
+
+/* Utility: Better touch targets on mobile */
+@media (hover: none) and (pointer: coarse) {
+    .button,
+    a {
+        min-height: 44px;
+        padding: 0.75rem 1rem;
+    }
+
+    .menu-list a {
+        padding: 0.75rem;
+    }
+}

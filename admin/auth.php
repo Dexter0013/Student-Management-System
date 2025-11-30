@@ -12,7 +12,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         exit();
     }
     
-    $query = "SELECT * FROM users WHERE Username = '$username' AND PasswordHash = '$password'";
+    $query = "SELECT * FROM users WHERE Username = '$username' AND PasswordHash = '$password' AND Role = 'Admin'";
     $result = mysqli_query($conn, $query);
     
     if ($result && mysqli_num_rows($result) > 0) {

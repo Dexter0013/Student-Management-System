@@ -21,8 +21,8 @@ $navItems = [
     ['label' => 'Dashboard', 'url' => 'dashboard.php', 'class' => ''],
     ['label' => 'View Table', 'url' => '#', 'class' => 'is-active']
 ];
-$logoutUrl = 'logout.php';
-$dashboardUrl = 'dashboard.php';
+$logoutUrl = 'admin/logout.php';
+$dashboardUrl = 'admin/dashboard.php';
 require_once '../componets/header.com.php';
 ?>
 <section class="section">
