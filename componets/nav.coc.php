@@ -8,7 +8,7 @@
 // ];
 // $navBasePath = '../'; // or '' for root
 
-// Default values if not set
+
 $navBasePath = isset($navBasePath) ? $navBasePath : '';
 $navItems = isset($navItems) ? $navItems : [];
 $showLogo = isset($showLogo) ? $showLogo : true;
@@ -26,7 +26,6 @@ $showLogo = isset($showLogo) ? $showLogo : true;
 // ];
 // $navBasePath = '../'; // or '' for root
 
-// Default values if not set
 $navBasePath = isset($navBasePath) ? $navBasePath : '';
 $navItems = isset($navItems) ? $navItems : [];
 $showLogo = isset($showLogo) ? $showLogo : true;
@@ -53,7 +52,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 ? (isset($dashboardUrl) ? $dashboardUrl : $navBasePath . 'dashboard.php')
                 : $navBasePath . 'index.php';
             ?>
-            <a class="navbar-item" href="<?php echo $logoLink; ?>">
+            <a class="navbar-item" style="position:sticky; top:0;" href="<?php echo $logoLink; ?>">
                 <img src="<?php echo $navBasePath; ?>images/logoNew.png" alt="Barak Valley Engineering College Logo" class="navbar-logo">
             </a>
         <?php endif; ?>

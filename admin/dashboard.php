@@ -19,25 +19,10 @@ $logoutUrl = 'admin/logout.php';
 $dashboardUrl = './dashboard.php';
 require_once '../componets/header.com.php';
 ?>
-<section class="section">
-  <div class="container">
-    <div class="columns">
-      <div class="column is-narrow">
-       
-        <aside class="menu is-fullheight">
-          <p class="menu-label">Tables</p>
-          <ul class="menu-list mb-1 mt-1 is-scrollable" style="max-height: 400px; overflow-y: auto;">
-                    <?php
-                    $tablesResult = mysqli_query($conn, "SHOW TABLES");
-                    while ($row = mysqli_fetch_row($tablesResult)) {
-                        $tableName = $row[0];
-                        echo '<li><a href="view_table.php?table=' . urlencode($tableName) . '">' . htmlspecialchars($tableName) . '</a></li>';
-                    }
-                    ?>
-                </ul>
-            </aside>
-        </div>
-        <div class="container">
+<section class="section is-flex">
+
+<?php require_once '../componets/side.coc.php'; ?>
+        <div class="container" style="margin-left:20px;">
             <h2 class="title is-4">Select a table from the menu to view and manage its records.</h2>
                     <?php
                     $studentCount = (int)mysqli_fetch_assoc(mysqli_query($conn, "SELECT COUNT(*) AS c FROM students"))['c'];
@@ -97,13 +82,6 @@ require_once '../componets/header.com.php';
         </div>
       </a>
     </div>
-
-  </div>
-</div>
-
-        </div>
-    
-
 </section>
 </body>
 </html>

@@ -1,6 +1,7 @@
 <?php
 session_start();
 require_once '../componets/conc.com.php';
+$activeTable = isset($_GET['table']) ? $_GET['table'] : '';
 
 if (!isset($_SESSION['logged_in']) || $_SESSION['logged_in'] !== true) {
     header("Location: index.php");
@@ -12,7 +13,6 @@ if (empty($tableName)) {
     header("Location: dashboard.php");
     exit();
 }
-
 $pageTitle = "View Table - " . htmlspecialchars($tableName);
 $basePath = '../';
 $showNavbar = true;
@@ -25,8 +25,9 @@ $logoutUrl = 'admin/logout.php';
 $dashboardUrl = 'admin/dashboard.php';
 require_once '../componets/header.com.php';
 ?>
-<section class="section">
-    <div class="container">
+<section class="section is-flex">
+<?php require_once '../componets/side.coc.php'; ?>
+    <div class="container" style="margin-left:20px; width:100%;">
         <div class="dashboard-header">
             <div class="level">
                 <div class="level-left">
