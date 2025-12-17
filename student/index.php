@@ -44,6 +44,7 @@ require_once '../componets/header.com.php';
                 </div>
                 <div class="has-text-centered back-button-container">
                     <a href="../index.php" class="button is-light">Back to Home</a>
+                    <a href="createStudent.php" class="button is-success">Create Account</a>
                 </div>
             </div>
         </div>

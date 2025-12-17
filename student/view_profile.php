@@ -15,6 +15,8 @@ $navItems = [
     ['label' => 'Home', 'url' => '../index.php', 'class' => ''],
     ['label' => 'Dashboard', 'url' => 'dashboard.php', 'class' => '']
 ];
+$logoutUrl = 'admin/logout.php';
+$dashboardUrl = './dashboard.php';
 require_once '../componets/header.com.php';
 
 // 1. Get Student ID
@@ -52,6 +54,7 @@ $profile = $stmt->get_result()->fetch_assoc();
                         <li><a href="view_profile.php" class="is-active">View Profile</a></li>
                         <li><a href="view_courses.php">View Courses</a></li>
                         <li><a href="view_grades.php">View Grades</a></li>
+                        <li><a style="background-color: var(--alert-red);color:white;" href="print_profile.php">Print Information</a></li>
                     </ul>
                 </aside>
             </div>
