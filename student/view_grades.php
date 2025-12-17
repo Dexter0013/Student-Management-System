@@ -14,6 +14,8 @@ $navItems = [
     ['label' => 'Home', 'url' => '../index.php', 'class' => ''],
     ['label' => 'Dashboard', 'url' => 'dashboard.php', 'class' => '']
 ];
+$logoutUrl = 'admin/logout.php';
+$dashboardUrl = './dashboard.php';
 require_once '../componets/header.com.php';
 
 // 1. Get Student ID

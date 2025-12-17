@@ -32,20 +32,7 @@ $showLogo = isset($showLogo) ? $showLogo : true;
 ?>
 
 
-<script>
-// Mobile menu toggle
-document.addEventListener('DOMContentLoaded', () => {
-    const navbarBurger = document.querySelector('.navbar-burger');
-    const navbarMenu = document.querySelector('#navbarMenu');
-    
-    if (navbarBurger) {
-        navbarBurger.addEventListener('click', () => {
-            navbarBurger.classList.toggle('is-active');
-            navbarMenu.classList.toggle('is-active');
-        });
-    }
-});
-</script>
+
         <?php
             // Redirect to dashboard if logged in, otherwise to home
             $logoLink = isset($_SESSION['logged_in']) && $_SESSION['logged_in'] 
@@ -108,17 +95,4 @@ document.addEventListener('DOMContentLoaded', () => {
     </div>
 </nav>
 
-<script>
-// Mobile menu toggle
-document.addEventListener('DOMContentLoaded', () => {
-    const navbarBurger = document.querySelector('.navbar-burger');
-    const navbarMenu = document.querySelector('#navbarMenu');
-    
-    if (navbarBurger) {
-        navbarBurger.addEventListener('click', () => {
-            navbarBurger.classList.toggle('is-active');
-            navbarMenu.classList.toggle('is-active');
-        });
-    }
-});
-</script>
+
