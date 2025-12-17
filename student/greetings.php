@@ -14,6 +14,7 @@
                 <br>
                 <a href="index.php" class="button is-link">Go to Login Page</a>
             </div>
+            
         </div>
     </section>
 </body>
