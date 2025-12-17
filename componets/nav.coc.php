@@ -13,7 +13,7 @@ $navBasePath = isset($navBasePath) ? $navBasePath : '';
 $navItems = isset($navItems) ? $navItems : [];
 $showLogo = isset($showLogo) ? $showLogo : true;
 ?>
-<nav class="navbar" role="navigation" aria-label="main navigation">
+<nav class="navbar" role="navigation" aria-label="main navigation" style="position:sticky; top:0; z-index:100; background-color:white;">
     <div class="navbar-brand">
         <?php if ($showLogo): ?>
     <?php
