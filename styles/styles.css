@@ -51,7 +51,7 @@ body {
 
 /* Links use green accent */
 a {
-    color: var(--accent-color);
+    color: var(--accent-lightest);
 }
 
 a:hover {
@@ -254,7 +254,7 @@ select:focus {
 
 /* Link button styling */
 .button.is-link {
-    color: var(--accent-color);
+    color: var(--accent-light);
 }
 
 .button.is-link:hover {

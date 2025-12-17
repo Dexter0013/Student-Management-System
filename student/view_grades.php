@@ -56,6 +56,7 @@ $marks = $stmt->get_result();
                         <li><a href="view_profile.php">View Profile</a></li>
                         <li><a href="view_courses.php">View Courses</a></li>
                         <li><a href="view_grades.php" class="is-active">View Grades</a></li>
+                        <li><a style="background-color: var(--alert-red);color:white;" href="print_profile.php">Print Information</a></li>
                     </ul>
                 </aside>
             </div>
